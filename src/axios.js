@@ -8,12 +8,13 @@ const instance = axios.create({
 
 instance.interceptors.response.use(
     (response) => {
-        // Thrown error for request with OK status code
-        const { data } = response;
-        
+        console.log("API Response:", response);
         return response.data;
     },
-    
+    (error) => {
+        console.error("API Error:", error.response ? error.response.data : error.message);
+        return Promise.reject(error);
+    }
 );
 
 export default instance;
