@@ -3,7 +3,7 @@ import { FormattedMessage } from "react-intl";
 import { connect } from "react-redux";
 import "../System/UserManage.scss";
 import ModalUser from "./ModalUser";
-import { getAllUsers } from "../../services/userService";
+import { getAllUsers, createNewUserService } from "../../services/userService";
 class UserManage extends Component {
   constructor(props) {
     super(props);
@@ -13,6 +13,9 @@ class UserManage extends Component {
     };
   }
   async componentDidMount() {
+    await this.getAllUsersFromReact();
+  }
+  getAllUsersFromReact = async () => {
     // console.log("Fetching users...");
     let response = await getAllUsers("ALL");
     if (response && response.users) {
@@ -20,7 +23,7 @@ class UserManage extends Component {
         arrUser: response.users,
       });
     }
-  }
+  };
   handleAddNewUser = () => {
     this.setState({
       isOpenModalUser: true,
@@ -30,6 +33,27 @@ class UserManage extends Component {
     this.setState((prevState) => ({
       isOpenModalUser: !prevState.isOpenModalUser,
     }));
+  };
+  createNewUser = async (data) => {
+    try {
+      let response = await createNewUserService(data);
+
+      console.log("Response create user: ", response);
+
+      // Kiểm tra nếu response là object và có status thành công
+      if (response && response.errCode == 0) {
+        // alert("Người dùng đã được tạo thành công!");
+        await this.getAllUsersFromReact();
+        this.setState((prevState) => ({
+          isOpenModalUser: false,
+        }));
+      } else {
+        alert(response?.message || "Có lỗi xảy ra khi tạo người dùng.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi tạo người dùng: ", error);
+      alert("Đã xảy ra lỗi, vui lòng thử lại.");
+    }
   };
 
   // lifr circle
@@ -43,6 +67,7 @@ class UserManage extends Component {
     return (
       <div className="users-container">
         <ModalUser
+          createNewUser={this.createNewUser}
           isOpen={this.state.isOpenModalUser}
           toggleFromParent={this.toggleUserModal}
         />
