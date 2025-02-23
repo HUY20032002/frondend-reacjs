@@ -3,36 +3,20 @@ import { FormattedMessage } from "react-intl";
 import { connect } from "react-redux";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import { emitter } from "../../utils/emitter";
-
-class ModalUser extends Component {
+import _ from "lodash";
+class ModalEditUser extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      id: "",
       email: "",
-      password: "",
       firstName: "",
       lastName: "",
       phoneNumber: "",
       address: "",
-      gender: "",
-      role: "",
     };
-    this.listentToEmitter();
   }
-  listentToEmitter() {
-    emitter.on("EVENT_CLEAR_MODAL_DATA", () => {
-      this.setState({
-        email: "",
-        password: "",
-        firstName: "",
-        lastName: "",
-        phoneNumber: "",
-        address: "",
-        gender: "",
-        role: "",
-      });
-    });
-  }
+
   toggle = () => {
     this.props.toggleFromParent();
   };
@@ -55,16 +39,7 @@ class ModalUser extends Component {
   };
   checkvalidateInput = () => {
     let isValid = true;
-    let arrInput = [
-      "email",
-      "password",
-      "firstName",
-      "lastName",
-      "phoneNumber",
-      "address",
-      "gender",
-      "role",
-    ];
+    let arrInput = ["email", "firstName", "lastName", "phoneNumber", "address"];
     for (let i = 0; i < arrInput.length; i++) {
       if (!this.state[arrInput[i]]) {
         isValid = false;
@@ -74,19 +49,33 @@ class ModalUser extends Component {
     }
     return isValid;
   };
-  handleAddNewUser = () => {
+  handleSaveUser = () => {
     let isValid = this.checkvalidateInput();
     if (isValid == true) {
-      this.props.createNewUser(this.state);
+      this.props.EditUser(this.state);
       // console.log("New user added:", this.state);
       // Reset state đúng cách
     }
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    let user = this.props.userEdit;
+    if (user && !_.isEmpty(user)) {
+      this.setState({
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phoneNumber: user.phonenumber,
+        address: user.address,
+        gender: user.gender,
+      });
+    }
+    console.log("ditmout edit modal: ", user);
+  }
 
   render() {
-    // console.log("check ", this.props);
+    console.log("check ", this.props);
     // console.log("check ", this.props.isOpen);
 
     return (
@@ -97,7 +86,7 @@ class ModalUser extends Component {
         size="lg"
         centered
       >
-        <ModalHeader toggle={() => this.toggle()}>Create New User</ModalHeader>
+        <ModalHeader toggle={() => this.toggle()}>Edit User</ModalHeader>
         <ModalBody>
           <div className="modal-user-body">
             <div className="input-container">
@@ -106,16 +95,7 @@ class ModalUser extends Component {
                 type="text"
                 onChange={(event) => this.handleOnChangeInput(event, "email")}
                 value={this.state.email}
-              ></input>
-            </div>
-            <div className="input-container">
-              <label>Password</label>
-              <input
-                type="password"
-                onChange={(event) =>
-                  this.handleOnChangeInput(event, "password")
-                }
-                value={this.state.password}
+                disabled
               ></input>
             </div>
             <div className="input-container">
@@ -159,24 +139,12 @@ class ModalUser extends Component {
             <div className="input-container">
               <label>Sex</label>
               <select
-                value={this.state.gender}
+                value={this.props.userEdit.gender}
                 onChange={(event) => this.handleOnChangeInput(event, "gender")}
               >
                 <option value="">-----Choice Your Sex-----</option>
                 <option value="0">Male</option>
                 <option value="1">Female</option>
-              </select>
-            </div>
-            <div className="input-container">
-              <label>Role</label>
-              <select
-                value={this.state.roleId}
-                onChange={(event) => this.handleOnChangeInput(event, "role")}
-              >
-                <option value="">-----Choice Your Role-----</option>
-                <option value="0">Admin</option>
-                <option value="1">Doctor</option>
-                <option value="2">Pratient</option>
               </select>
             </div>
           </div>
@@ -185,9 +153,9 @@ class ModalUser extends Component {
           <Button
             color="primary"
             className="px-3"
-            onClick={() => this.handleAddNewUser()}
+            onClick={() => this.handleSaveUser()}
           >
-            Add New
+            Save Change User
           </Button>
           <Button
             color="secondary"
@@ -210,4 +178,4 @@ const mapDispatchToProps = (dispatch) => {
   return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ModalUser);
+export default connect(mapStateToProps, mapDispatchToProps)(ModalEditUser);
