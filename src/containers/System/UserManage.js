@@ -19,6 +19,7 @@ class UserManage extends Component {
       arrUser: [],
       isOpenModalUser: false,
       isOpenModaEditlUser: false,
+
       userEdit: {},
     };
   }
@@ -49,6 +50,11 @@ class UserManage extends Component {
   toggleUserEditModal = () => {
     this.setState((prevState) => ({
       isOpenModaEditlUser: !prevState.isOpenModaEditlUser,
+    }));
+  };
+  toggleUserShowModal = () => {
+    this.setState((prevState) => ({
+      isOpenModaShowlUser: !prevState.isOpenModaShowlUser,
     }));
   };
   // Tạo người dùng mới
@@ -177,9 +183,7 @@ class UserManage extends Component {
                       >
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button className="btn-showuser">
-                        <i class="fas fa-user-alt"></i>
-                      </button>
+
                       <button
                         className="btn-delete"
                         onClick={() => this.handleDeleteUser(item.id)}
